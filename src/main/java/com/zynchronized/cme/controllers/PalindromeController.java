@@ -1,6 +1,7 @@
 package com.zynchronized.cme.controllers;
 
 import com.zynchronized.cme.dao.PalindromeRequest;
+import com.zynchronized.cme.services.PalindromeService;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class PalindromeController {
 
   private static final Logger log = LoggerFactory.getLogger(PalindromeController.class);
+  private final PalindromeService palindromeService;
+
+  public PalindromeController(final PalindromeService palindromeService) {
+    this.palindromeService = palindromeService;
+  }
 
   @PostMapping
   public void post(@Valid @RequestBody PalindromeRequest request) {
-    log.info("hello, {}", request);
+    palindromeService.isPalindrome(request.getText());
   }
 }
