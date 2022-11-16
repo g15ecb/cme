@@ -1,5 +1,10 @@
+FROM amazoncorretto:17 as builder
+WORKDIR /cme
+COPY . .
+RUN ./mvnw -DskipTests package
+
 FROM amazoncorretto:17
 WORKDIR /cme
-COPY target/cme-0.0.1-SNAPSHOT.jar cme.jar
+COPY --from=builder /cme/target/cme-0.0.1-SNAPSHOT.jar ./cme.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/cme/cme.jar"]
