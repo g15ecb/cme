@@ -6,19 +6,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class InMemoryRepositoryQueue implements RepositoryWriteQueue {
 
-  private final ConcurrentLinkedQueue<String> q;
+  private final ConcurrentLinkedQueue<Result> q;
 
   public InMemoryRepositoryQueue() {
     q = new ConcurrentLinkedQueue<>();
   }
 
   @Override
-  public void enqueue(String s) {
-    q.add(s);
+  public void enqueue(final Result r) {
+    q.add(r);
   }
 
   @Override
-  public String dequeue() {
+  public Result dequeue() {
     return q.poll();
   }
 }

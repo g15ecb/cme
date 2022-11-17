@@ -17,16 +17,16 @@ public class BatchedRepositoryWriter implements RepositoryWriter {
   public void run() {
     while (true) {
       try {
-        final String s = RepositoryQueue.Q.dequeue();
-        if (null == s) {
+        final Result r = RepositoryQueue.Q.dequeue();
+        if (null == r) {
           Thread.sleep(1000);
           continue;
         }
-        if (repository.contains(s)) {
-          log.debug("Not writing, {}", s);
+        if (repository.contains(r.getInput())) {
+          log.debug("Not writing, {}", r);
         } else {
-          log.debug("Writing, {}", s);
-          repository.put(s, false);
+          log.debug("Writing, {}", r);
+          repository.put(r);
         }
       } catch (InterruptedException e) {
         throw new RuntimeException(e);

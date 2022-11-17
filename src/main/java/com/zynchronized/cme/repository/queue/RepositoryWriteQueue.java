@@ -2,7 +2,7 @@ package com.zynchronized.cme.repository.queue;
 
 public interface RepositoryWriteQueue {
 
-  void enqueue(final String s);
+  void enqueue(final Result r);
 
-  String dequeue();
+  Result dequeue();
 }

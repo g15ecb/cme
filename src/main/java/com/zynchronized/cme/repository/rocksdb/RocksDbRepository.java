@@ -1,9 +1,11 @@
 package com.zynchronized.cme.repository.rocksdb;
 
 import com.zynchronized.cme.repository.PalindromeRepository;
+import com.zynchronized.cme.repository.queue.Result;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.rocksdb.Options;
@@ -39,10 +41,10 @@ public class RocksDbRepository implements PalindromeRepository {
   }
 
   @Override
-  public void put(String k, boolean v) {
-    log.info("Persisting, {}", k);
+  public void put(final Result r) {
+    log.info("Persisting, {}", r);
     try {
-      db.put(k.getBytes(StandardCharsets.UTF_8), v ? TRUE : FALSE);
+      db.put(r.getInput().getBytes(StandardCharsets.UTF_8), r.getOutput() ? TRUE : FALSE);
     } catch (RocksDBException e) {
       throw new RuntimeException(e);
     }
@@ -60,11 +62,11 @@ public class RocksDbRepository implements PalindromeRepository {
   }
 
   @Override
-  public List<String> get() {
-    final var keys = new ArrayList<String>();
+  public List<Result> get() {
+    final var keys = new ArrayList<Result>();
     try (final RocksIterator iter = db.newIterator()) {
       for (iter.seekToFirst(); iter.isValid(); iter.next()) {
-        keys.add(new String(iter.key()));
+        keys.add(new Result(new String(iter.key()), Arrays.equals(iter.value(), TRUE)));
       }
     }
     return keys;
