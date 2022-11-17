@@ -16,7 +16,8 @@ class PalindromeTextValidatorTest {
     assertFalse(validator.isValid(s, null));
   }
 
-  // there's no rule specified for punctuation, so currently they fall under the palindromic semantics
+  // there's no rule specified for punctuation, so currently they fall under the palindromic
+  // semantics
   @ParameterizedTest
   @ValueSource(strings = {"abcdefg", "!AbdefFhi!j?abc", "mum"})
   public void testPasses(final String s) {

@@ -1,6 +1,6 @@
 package com.zynchronized.cme.controllers;
 
-import com.zynchronized.cme.dao.PalindromeRequest;
+import com.zynchronized.cme.dto.PalindromeRequestDto;
 import com.zynchronized.cme.services.PalindromeService;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class PalindromeController {
   }
 
   @PostMapping
-  public void post(@Valid @RequestBody PalindromeRequest request) {
+  public void post(@Valid @RequestBody PalindromeRequestDto request) {
     palindromeService.isPalindrome(request.getText());
   }
 }
