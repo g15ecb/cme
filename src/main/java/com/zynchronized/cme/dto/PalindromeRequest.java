@@ -3,14 +3,14 @@ package com.zynchronized.cme.dto;
 import com.zynchronized.cme.validators.PalindromeText;
 import javax.validation.constraints.NotBlank;
 
-public final class PalindromeRequestDto {
+public final class PalindromeRequest {
 
   @NotBlank private String username;
   @PalindromeText private String text;
 
-  public PalindromeRequestDto() {}
+  public PalindromeRequest() {}
 
-  public PalindromeRequestDto(final String username, final String text) {
+  public PalindromeRequest(final String username, final String text) {
     this.username = username;
     this.text = text;
   }
@@ -33,13 +33,6 @@ public final class PalindromeRequestDto {
 
   @Override
   public String toString() {
-    return "PalindromeRequestDto{"
-        + "username='"
-        + username
-        + '\''
-        + ", text='"
-        + text
-        + '\''
-        + '}';
+    return "PalindromeRequest{" + "username='" + username + '\'' + ", text='" + text + '\'' + '}';
   }
 }
