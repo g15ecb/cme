@@ -20,7 +20,12 @@ jobs:
           check-latest: true
 
       - name: mvn
-        run: ./mvnw package
+        run: ./mvnw -B test
+
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          generate-branches-badge: true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
