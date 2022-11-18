@@ -2,7 +2,6 @@ package com.zynchronized.cme.cache.ehcache;
 
 import com.zynchronized.cme.cache.CachingInitialiser;
 import com.zynchronized.cme.repository.PalindromeRepository;
-import com.zynchronized.cme.repository.queue.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -34,12 +33,16 @@ public class EhcacheInitialiser extends CachingInitialiser {
   }
 
   @Override
-  public void initialise() {
+  public void initialise() throws Exception {
     final Cache cache = cacheManager.getCache("palindrome");
-    final var persisted = repository.get();
-    for (final Result r : persisted) {
-      cache.put(r.getInput(), r.getOutput());
+    int loaded = 0;
+    try (var iter = repository.iterator()) {
+      while (iter.hasNext()) {
+        final var r = iter.next();
+        cache.put(r.input(), r.output());
+        ++loaded;
+      }
     }
-    log.info("Loaded {} persisted cache entries", persisted.size());
+    log.info("Loaded {} persisted cache entries", loaded);
   }
 }

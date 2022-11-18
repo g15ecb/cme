@@ -8,6 +8,9 @@ public final class PalindromeTextValidator implements ConstraintValidator<Palind
   @Override
   public boolean isValid(
       final String s, final ConstraintValidatorContext constraintValidatorContext) {
+    if (null == s) {
+      return false;
+    }
     for (int i = 0; i < s.length(); i++) {
       final char c = s.charAt(i);
       if (' ' == c) {

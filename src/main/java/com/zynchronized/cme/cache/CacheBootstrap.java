@@ -25,8 +25,12 @@ public class CacheBootstrap implements ApplicationListener<ApplicationReadyEvent
   @Override
   public void onApplicationEvent(ApplicationReadyEvent event) {
     final Instant start = Instant.now();
-    cachingProvider.initialise();
-    log.info("Took(ms): {}", Duration.between(start, Instant.now()).toMillis());
+    try {
+      cachingProvider.initialise();
+      log.info("Took(ms): {}", Duration.between(start, Instant.now()).toMillis());
+    } catch (Exception e) {
+      log.error("Failed to initialise cache", e);
+    }
     new Thread(writer).start();
   }
 }

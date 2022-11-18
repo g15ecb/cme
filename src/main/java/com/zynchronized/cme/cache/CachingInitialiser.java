@@ -9,5 +9,5 @@ public abstract class CachingInitialiser {
   @Autowired protected CacheManager cacheManager;
 
   /** Initialises any cache state upon application start, if applicable. */
-  public abstract void initialise();
+  public abstract void initialise() throws Exception;
 }

@@ -1,7 +1,6 @@
 package com.zynchronized.cme.repository;
 
 import com.zynchronized.cme.repository.queue.Result;
-import java.util.List;
 
 public interface PalindromeRepository {
 
@@ -9,5 +8,5 @@ public interface PalindromeRepository {
 
   boolean contains(String k);
 
-  List<Result> get();
+  PalindromeRepositoryIterator iterator();
 }
