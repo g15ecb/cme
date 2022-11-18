@@ -6,8 +6,11 @@ import javax.validation.ConstraintValidatorContext;
 public final class PalindromeTextValidator implements ConstraintValidator<PalindromeText, String> {
 
   @Override
-  public boolean isValid(final String s,
-      final ConstraintValidatorContext constraintValidatorContext) {
+  public boolean isValid(
+      final String s, final ConstraintValidatorContext constraintValidatorContext) {
+    if (null == s) {
+      return false;
+    }
     for (int i = 0; i < s.length(); i++) {
       final char c = s.charAt(i);
       if (' ' == c) {
