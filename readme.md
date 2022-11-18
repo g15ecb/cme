@@ -1,5 +1,7 @@
 # CME
 
+![Coverage](.github/badges/jacoco.svg)
+
 The quickest way to get up and running is to use maven wrapper to run the
 application. The following will bind the API port to `:8080` and resp. the
 actuator to `:4000`.
