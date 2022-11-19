@@ -6,6 +6,7 @@ import com.zynchronized.cme.CmeApplication;
 import com.zynchronized.cme.RocksDbUtil;
 import com.zynchronized.cme.repository.PalindromeRepository;
 import com.zynchronized.cme.repository.queue.Result;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -20,7 +21,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = CmeApplication.class)
 @TestPropertySource(
-    properties = {"rocksdb.databaseFile=iter.db", "batchedrepositorywriter.backoff=1000"})
+    properties = {
+      "rocksdb.databaseFile=iter.db",
+      "batchedrepositorywriter.backoff=1000",
+      "batchedrepositorywriter.batchSize=1000"
+    })
 class RocksDbIteratorTest {
 
   private static final String dbFile = "iter.db";
@@ -43,7 +48,7 @@ class RocksDbIteratorTest {
     final var r2 = new Result("happy", false);
     final var expected = Map.of(r1.input(), r1, r2.input(), r2);
     for (final var e : expected.values()) {
-      repository.put(e);
+      repository.put(Arrays.asList(r1, r2));
     }
     try (var iter = repository.iterator()) {
       final Map<String, Result> actual = new HashMap<>();

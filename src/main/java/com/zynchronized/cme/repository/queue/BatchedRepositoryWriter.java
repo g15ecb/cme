@@ -1,6 +1,11 @@
 package com.zynchronized.cme.repository.queue;
 
 import com.zynchronized.cme.repository.PalindromeRepository;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,33 +20,51 @@ public class BatchedRepositoryWriter implements RepositoryWriter {
   @Value("${batchedrepositorywriter.backoff}")
   private int backoff;
 
-  @Autowired PalindromeRepository repository;
+  @Value("${batchedrepositorywriter.batchSize}")
+  private int batchSize;
+
+  @Autowired
+  PalindromeRepository repository;
+
+  private final AtomicBoolean enabled = new AtomicBoolean();
 
   Result process(final RepositoryWriteQueue q) {
     return q.dequeue();
   }
 
-  boolean persist(final Result r) {
-    boolean persisted = false;
-    if (!repository.contains(r.input())) {
-      repository.put(r);
-      persisted = true;
+  List<Result> batch(final RepositoryWriteQueue q) {
+    final List<Result> batch = new ArrayList<>();
+    for (int i = 0; i < batchSize - 1; i++) {
+      final var r = process(q);
+      if (null != r) {
+        batch.add(r);
+      } else {
+        break;
+      }
     }
-    return persisted;
+    return batch;
   }
 
   @Override
   public void run() {
-    log.info("Starting. Poll-Backoff(ms): {}", backoff);
+    log.info("Starting. Poll-Backoff(ms): {}; Max-Batch-Size: {}", backoff, batchSize);
     while (true) {
       try {
-        final Result r = process(RepositoryQueue.Q);
+        Result r = process(RepositoryQueue.Q);
+        // a bit messy but we do the check before we allocate the subsequent collection
         if (null == r) {
           Thread.sleep(backoff);
           continue;
         }
-        final boolean persisted = persist(r);
-        log.trace("Persisted({}): {}", persisted, r);
+
+        final Instant start = Instant.now();
+        final List<Result> thisBatch = batch(RepositoryQueue.Q);
+        thisBatch.add(r);
+        repository.put(thisBatch);
+        log.trace(
+            "Wrote: {} result(s), Took(ms): {}",
+            thisBatch.size(),
+            Duration.between(start, Instant.now()).toMillis());
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }

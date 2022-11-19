@@ -74,6 +74,7 @@ class EhcacheEventListenerTest {
   public void testHandleCreated() {
     final var listener = new EhcacheEventListener();
     final var q = new InMemoryRepositoryQueue();
+    q.enableEnqueue();
     final boolean actual = listener.handle(createdEvent, q);
     assertTrue(actual);
     final var result = q.dequeue();
@@ -84,6 +85,7 @@ class EhcacheEventListenerTest {
   public void testHandleOtherEvent() {
     final var listener = new EhcacheEventListener();
     final var q = new InMemoryRepositoryQueue();
+    q.enableEnqueue();
     final boolean actual = listener.handle(otherEvent, q);
     assertFalse(actual);
     assertNull(q.dequeue());

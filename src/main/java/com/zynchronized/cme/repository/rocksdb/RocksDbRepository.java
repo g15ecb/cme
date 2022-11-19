@@ -5,10 +5,13 @@ import com.zynchronized.cme.repository.PalindromeRepositoryIterator;
 import com.zynchronized.cme.repository.queue.Result;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.WriteBatch;
+import org.rocksdb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,24 +44,24 @@ public class RocksDbRepository implements PalindromeRepository {
     }
   }
 
-  @Override
-  public void put(final Result r) {
-    log.trace("Persisting, {}", r);
-    try {
-      db.put(r.input().getBytes(StandardCharsets.UTF_8), r.output() ? TRUE : FALSE);
-    } catch (RocksDBException e) {
-      throw new RuntimeException(e);
-    }
+  private static byte[] getBoolean(final boolean b) {
+    return b ? TRUE : FALSE;
   }
 
   @Override
-  public boolean contains(final String k) {
+  public void put(final List<Result> results) {
+    final var batch = new WriteBatch();
+    for (final var r : results) {
+      try {
+        batch.put(r.input().getBytes(StandardCharsets.UTF_8), getBoolean(r.output()));
+      } catch (RocksDBException e) {
+        log.error("Failed to add result to batch", e);
+      }
+    }
     try {
-      final var bs = db.get(k.getBytes(StandardCharsets.UTF_8));
-      final boolean hit = null != bs && 1 == bs.length;
-      return hit;
+      db.write(new WriteOptions(), batch);
     } catch (RocksDBException e) {
-      throw new RuntimeException(e);
+      log.error("Failed to write batch", e);
     }
   }
 
