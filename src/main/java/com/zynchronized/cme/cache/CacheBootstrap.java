@@ -1,5 +1,6 @@
 package com.zynchronized.cme.cache;
 
+import com.zynchronized.cme.repository.queue.RepositoryQueue;
 import com.zynchronized.cme.repository.queue.RepositoryWriter;
 import java.time.Duration;
 import java.time.Instant;
@@ -31,6 +32,7 @@ public class CacheBootstrap implements ApplicationListener<ApplicationReadyEvent
     } catch (Exception e) {
       log.error("Failed to initialise cache", e);
     }
+    RepositoryQueue.Q.enableEnqueue();
     new Thread(writer).start();
   }
 }
