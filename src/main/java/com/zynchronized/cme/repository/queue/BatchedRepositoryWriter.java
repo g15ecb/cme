@@ -23,8 +23,7 @@ public class BatchedRepositoryWriter implements RepositoryWriter {
   @Value("${batchedrepositorywriter.batchSize}")
   private int batchSize;
 
-  @Autowired
-  PalindromeRepository repository;
+  @Autowired PalindromeRepository repository;
 
   private final AtomicBoolean enabled = new AtomicBoolean();
 
