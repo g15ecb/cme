@@ -10,11 +10,11 @@ import javax.validation.Payload;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PalindromeTextValidator.class)
+@Constraint(validatedBy = ContainsNoSpacesOrNumbersValidator.class)
 @Documented
-public @interface PalindromeText {
+public @interface ContainsNoSpacesOrNumbers {
 
-  String message() default "{PalindromeText.invalid}";
+  String message() default "{ContainsNoSpacesOrNumbers.invalid}";
 
   Class<?>[] groups() default {};
 

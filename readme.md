@@ -18,8 +18,9 @@ API requests can now be submitted, e.g.
 > curl \
 >   -X POST \
 >   -H "Content-Type: application/json" \
->   -d '{"username": "gbarnett", "text": "kayak"}' \ 
+>   -d '{"username": "gbarnett", "text": "kayak"}' \
 >   http://localhost:8080/api/v1/palindrome
+{"palindrome":true}
 ```
 
 _Note._ You can visit `http://localhost:8080/api-docs` to get an Open API 3.0
@@ -27,25 +28,25 @@ description of the API.
 
 ### Cache Persistence
 
-You can submit a number of API requests, interrupt and restart the server
-and the in-memory cache will hydrate from the persistence store (RocksDB). For
+You can submit a number of API requests, interrupt and restart the server and
+the in-memory cache will hydrate from the persistence store (RocksDB). For
 example, after issuing the following on a fresh system:
 
 ```bash
-> curl -X POST -H "Content-Type: application/json" -d '{"username": 
+> curl -X POST -H "Content-Type: application/json" -d '{"username":
 "gbarnett", "text": "data"}'  http://localhost:8080/api/v1/palindrome
-> curl -X POST -H "Content-Type: application/json" -d '{"username": 
+> curl -X POST -H "Content-Type: application/json" -d '{"username":
 "gbarnett", "text": "kayak"}'  http://localhost:8080/api/v1/palindrome
-> curl -X POST -H "Content-Type: application/json" -d '{"username": 
+> curl -X POST -H "Content-Type: application/json" -d '{"username":
 "gbarnett", "text": "mum"}'  http://localhost:8080/api/v1/palindrome
-> curl -X POST -H "Content-Type: application/json" -d '{"username": 
+> curl -X POST -H "Content-Type: application/json" -d '{"username":
 "gbarnett", "text": "o!n!o"}'  http://localhost:8080/api/v1/palindrome
-> curl -X POST -H "Content-Type: application/json" -d '{"username": 
+> curl -X POST -H "Content-Type: application/json" -d '{"username":
 "gbarnett", "text": "example"}'  http://localhost:8080/api/v1/palindrome
 ```
 
-If you interrupt and then restart the service you will observe the following
-log messages:
+If you interrupt and then restart the service you will observe the following log
+messages:
 
 ```
 2022-11-18 09:08:02.444  INFO 3875 --- [main] com.zynchronized.cme.CmeApplication      : Started CmeApplication in 1.449 seconds (JVM running for 1.566)
@@ -83,10 +84,10 @@ jvm_memory_max_bytes{area="heap",id="G1 Survivor Space",} -1.0
 
 ### Docker
 
-There is a Docker image published
-by [this](https://github.com/g15ecb/cme/actions)
-Github Action on push to `main`. Note that I am overwriting `latest` to not spam
-my repository. (The latter is not something I would do for something serious.)
+There is a Docker image published by
+[this](https://github.com/g15ecb/cme/actions) Github Action on push to `main`.
+Note that I am overwriting `latest` to not spam my repository. (The latter is
+not something I would do for something serious.)
 
 ```bash
 > # make a directory to store the database file should one not exist; this
@@ -107,6 +108,32 @@ session.
 
 ## Design
 
+![](cme.svg)
+
+_Note._ I have applied the restriction of no spaces or numbers to both the
+username and text component of the request.
+
+_Cache._ The cache uses the Spring caching abstraction. The cache used is
+ehcache. I couldn't quite get the cache interceptor working how I'd like so the
+cache in practice is coupled to ehcache as its event listener mechanism (rather
+than a generic cache interceptor) is used to write-through to the underlying
+repository. If I had a bit more time to spend on this I would certainly correct
+this abstraction to decouple that semantics.
+
+_Persistence._ A single I/O thread exists to perform the cache write-through;
+this keeps the thread pool for servicing HTTP requests and the event listener
+thread of ehcache responsive. I don't attempt to shut this thread down in any
+graceful way: RocksDB is very forgiving in this regard but for other persistence
+stores that would most likely change. Writes to the repository are batched. The
+persistence store is RocksDB. The cache write-through is not transactional; it
+seemed overkill to make it so, nor is it any type of WAL: it's best effort. The
+persisted cache entries are loaded on startup into ehcache. The most ugly piece
+of this project is the queue that sits between the cache and the persistence
+layer: in the performance tests I drain this queue aggressively to remove
+references to its items quickly. If I dedicated more time to this I would make
+this queue bounded, have a nicer integration and deal with things like back
+pressure, etc.
+
 ## Performance
 
 I use [k6](https://k6.io) to perform a few basic performance tests.
@@ -123,7 +150,7 @@ java -jar -Xms1G -Xmx2G target/cme-0.0.1-SNAPSHOT.jar
 And:
 
 ```bash
-> java -version 
+> java -version
 openjdk version "17.0.5" 2022-10-18 LTS
 OpenJDK Runtime Environment Corretto-17.0.5.8.1 (build 17.0.5+8-LTS)
 OpenJDK 64-Bit Server VM Corretto-17.0.5.8.1 (build 17.0.5+8-LTS, mixed mode, sharing)
@@ -139,7 +166,7 @@ is eyeballed by using [VisualVM](https://visualvm.github.io).
 > curl -X POST -H "Content-Type: application/json" -d '{"username": "gbarnett", "text": "abba"}'  http://localhost:8080/api/v1/palindrome
 > # 100 concurrent users repeatedly hitting the same API with the above request
 > # for a duration of 100s
-> k6 run -u 100 --duration 100s cache-hit.js 
+> k6 run -u 100 --duration 100s cache-hit.js
 ```
 
 _Results._
@@ -192,7 +219,7 @@ Peak heap usage is ~669MB.
 ```bash
 > # 100 concurrent users repeatedly hitting the API with random strings up to 150
 > # chars in length for a duration of 100s
-> k6 run -u 100 --duration 100s cache-miss.js 
+> k6 run -u 100 --duration 100s cache-miss.js
 ```
 
 _Results._

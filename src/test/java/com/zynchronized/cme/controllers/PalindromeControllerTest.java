@@ -33,7 +33,12 @@ class PalindromeControllerTest {
   @Autowired private ObjectMapper mapper;
 
   private static Stream<Arguments> invalidRequestParameters() {
-    return Stream.of(Arguments.of("", "hello"), Arguments.of("gbarnett", "123"));
+    return Stream.of(
+        Arguments.of("", "hello"),
+        Arguments.of("gbarnett", "123"),
+        Arguments.of("g12", "abd"),
+        Arguments.of("g b", "abd"),
+        Arguments.of("gbarnett", "ab c"));
   }
 
   private static Stream<Arguments> validRequestParameters() {

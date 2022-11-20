@@ -3,7 +3,8 @@ package com.zynchronized.cme.validators;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public final class PalindromeTextValidator implements ConstraintValidator<PalindromeText, String> {
+public final class ContainsNoSpacesOrNumbersValidator
+    implements ConstraintValidator<ContainsNoSpacesOrNumbers, String> {
 
   @Override
   public boolean isValid(

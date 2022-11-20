@@ -6,10 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-// Note that everything outside of the rules specified in the design brief are considered valid and
-// therefore are tested under a palindromic semantics -- one would argue this is incorrect but as
-// it's not in the requirements I will defer that to a future discussion. I'm keeping validation at
-// the boundary of the public API (the REST controller), hence no validation here.
+// the inputs here are only tested for inputs that the controller and its validation permits, hence
+// the tame inputs.
 class PalindromeTest {
 
   private static final Palindrome predicate = new Palindrome();
