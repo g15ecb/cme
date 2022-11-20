@@ -1,12 +1,12 @@
 package com.zynchronized.cme.dto;
 
-import com.zynchronized.cme.validators.PalindromeText;
+import com.zynchronized.cme.validators.ContainsNoSpacesOrNumbers;
 import javax.validation.constraints.NotBlank;
 
 public final class PalindromeRequest {
 
-  @NotBlank private String username;
-  @PalindromeText private String text;
+  @NotBlank @ContainsNoSpacesOrNumbers private String username;
+  @NotBlank @ContainsNoSpacesOrNumbers private String text;
 
   public PalindromeRequest() {}
 

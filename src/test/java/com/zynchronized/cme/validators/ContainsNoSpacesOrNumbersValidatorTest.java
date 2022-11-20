@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class PalindromeTextValidatorTest {
+class ContainsNoSpacesOrNumbersValidatorTest {
 
-  private static final PalindromeTextValidator validator = new PalindromeTextValidator();
+  private static final ContainsNoSpacesOrNumbersValidator validator =
+      new ContainsNoSpacesOrNumbersValidator();
 
   @ParameterizedTest
   @ValueSource(strings = {"ab c ", " ", "    ", "abcdef12ghi", "1", "   s 213e  "})
